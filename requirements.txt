@@ -1,0 +1,11 @@
+alembic
+asyncpg
+requests
+sentry-sdk
+SQLAlchemy
+openai
+pytest
+pytest-asyncio
+pyyaml
+httpx
+psycopg2-binary
