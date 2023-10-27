@@ -2,7 +2,7 @@ import openai
 import time
 import logging
 import asyncio
-from src.env import VALID_CATEGORIES, OPENAI_PROMPT, OPENAI_MODEL, DEFAULT_CATEGORY
+from bugbounty_gpt.env import VALID_CATEGORIES, OPENAI_PROMPT, OPENAI_MODEL, DEFAULT_CATEGORY
 
 logger = logging.getLogger(__name__)
 

@@ -1,12 +1,12 @@
 import logging
 import asyncio
 
-from src.db import db_handler
-from src.db.models import SubmissionState
-from src.handlers.openai_handler import OpenAIHandler
-from src.handlers.submission_handler import BugCrowdSubmission
-from src.handlers.bugcrowd_api import BugCrowdAPI
-from src.env import USER_ID, FILTER_PROGRAM, RESPONSE_CATEGORIES, SQLALCHEMY_URL
+from bugbounty_gpt.db import db_handler
+from bugbounty_gpt.db.models import SubmissionState
+from bugbounty_gpt.handlers.openai_handler import OpenAIHandler
+from bugbounty_gpt.handlers.submission_handler import BugCrowdSubmission
+from bugbounty_gpt.handlers.bugcrowd_api import BugCrowdAPI
+from bugbounty_gpt.env import USER_ID, FILTER_PROGRAM, RESPONSE_CATEGORIES, SQLALCHEMY_URL
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker

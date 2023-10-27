@@ -1,5 +1,5 @@
 import pytest
-import src.env as env
+import bugbounty_gpt.env as env
 
 def test_sanitize_category():
     assert env.sanitize_category("Functional Bugs or Glitches") == "FUNCTIONAL_BUGS_OR_GLITCHES"

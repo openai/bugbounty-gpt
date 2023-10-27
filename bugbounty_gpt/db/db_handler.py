@@ -1,4 +1,4 @@
-from src.db.models import Submission
+from bugbounty_gpt.db.models import Submission
 from sqlalchemy import select
 import logging
 

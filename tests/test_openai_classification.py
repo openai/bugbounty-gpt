@@ -1,6 +1,6 @@
-from src.handlers.openai_handler import OpenAIHandler
+from bugbounty_gpt.handlers.openai_handler import OpenAIHandler
 from unittest.mock import patch, AsyncMock
-from src.env import OPENAI_PROMPT, OPENAI_MODEL, DEFAULT_CATEGORY
+from bugbounty_gpt.env import OPENAI_PROMPT, OPENAI_MODEL, DEFAULT_CATEGORY
 import pytest, asyncio
 
 def test_classifications_sanitization():
@@ -21,7 +21,7 @@ def test_build_request_data():
 
 def test_handle_response_error():
     error = Exception("Sample Error")
-    with patch("src.handlers.openai_handler.logger.error") as mock_error:
+    with patch("bugbounty_gpt.handlers.openai_handler.logger.error") as mock_error:
         result_category, result_message = OpenAIHandler._handle_response_error(error)
         mock_error.assert_called_once_with("An error occurred during the OpenAI request: Sample Error")
         assert result_category == DEFAULT_CATEGORY
@@ -45,7 +45,7 @@ def test_handle_response_unsanitized_category():
 
 def test_handle_response_exception():
     response = type("Response", (object,), {"choices": []})
-    with patch("src.handlers.openai_handler.OpenAIHandler._handle_response_error") as mock_handle_error:
+    with patch("bugbounty_gpt.handlers.openai_handler.OpenAIHandler._handle_response_error") as mock_handle_error:
         OpenAIHandler._handle_response(response)
         mock_handle_error.assert_called()
 
@@ -53,7 +53,7 @@ def test_handle_response_exception():
 async def test_classify_submission_exception():
     with patch("openai.ChatCompletion.create") as mock_create:
         mock_create.side_effect = Exception("Sample Error")
-        with patch("src.handlers.openai_handler.OpenAIHandler._handle_response_error") as mock_handle_error:
+        with patch("bugbounty_gpt.handlers.openai_handler.OpenAIHandler._handle_response_error") as mock_handle_error:
             await OpenAIHandler.classify_submission("Sample content")
             mock_handle_error.assert_called()
 

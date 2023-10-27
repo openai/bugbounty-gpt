@@ -4,8 +4,8 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-import src.db.models as models
-from src.env import SQLALCHEMY_URL
+import bugbounty_gpt.db.models as models
+from bugbounty_gpt.env import SQLALCHEMY_URL
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Run the migration script
-python -m src.db.migrate
+python -m bugbounty_gpt.db.migrate
 
 # Start the main application
-python -m src.main
+python -m bugbounty_gpt

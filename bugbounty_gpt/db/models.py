@@ -1,5 +1,5 @@
 from enum import Enum
-from src.env import VALID_CATEGORIES
+from bugbounty_gpt.env import VALID_CATEGORIES
 from sqlalchemy import Column, DateTime, Integer, String, Text, func, Enum as SqlEnum
 from sqlalchemy.orm import declarative_base
 

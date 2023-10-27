@@ -2,7 +2,7 @@ from alembic.config import Config
 from alembic import command
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.exc import OperationalError
-from src.env import SQLALCHEMY_URL
+from bugbounty_gpt.env import SQLALCHEMY_URL
 import time
 import logging
 

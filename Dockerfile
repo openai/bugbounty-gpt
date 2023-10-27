@@ -18,9 +18,10 @@ COPY alembic /usr/src/app/alembic
 
 # Change the owner of the Alembic directory to the non-root user
 RUN chown -R myuser:myuser /usr/src/app/alembic
+RUN mkdir -p /usr/src/app/alembic/versions && chown -R myuser:myuser /usr/src/app/alembic/versions
 
 # Copy the local src directory contents and the config file into the container
-COPY src/ ./src/
+COPY bugbounty_gpt/ ./bugbounty_gpt/
 COPY config.yaml .
 
 # Switch to the non-root user
@@ -31,4 +32,4 @@ ARG EPHEMERAL_DB=false
 ENV EPHEMERAL_DB=${EPHEMERAL_DB}
 
 # If EPHEMERAL_DB is "true", run start.sh, otherwise run python -m src.main
-CMD if [ "$EPHEMERAL_DB" = "true" ]; then /usr/src/app/src/start.sh; else python -m src.main; fi
+CMD if [ "$EPHEMERAL_DB" = "true" ]; then /usr/src/app/bugbounty_gpt/start.sh; else python -m bugbounty_gpt; fi

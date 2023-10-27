@@ -1,5 +1,5 @@
-from src.handlers.bugcrowd_api import BugCrowdAPI
-from src.env import RESPONSES
+from bugbounty_gpt.handlers.bugcrowd_api import BugCrowdAPI
+from bugbounty_gpt.env import RESPONSES
 import logging
 import json
 

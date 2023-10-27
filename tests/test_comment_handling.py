@@ -1,5 +1,5 @@
-from src.handlers.submission_handler import BugCrowdSubmission
-from src.handlers.bugcrowd_api import BugCrowdAPI
+from bugbounty_gpt.handlers.submission_handler import BugCrowdSubmission
+from bugbounty_gpt.handlers.bugcrowd_api import BugCrowdAPI
 from unittest.mock import patch, AsyncMock
 import logging
 import pytest

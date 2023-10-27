@@ -1,4 +1,4 @@
-import src.db.models as models
+import bugbounty_gpt.db.models as models
 
 def test_sanitize_category_name():
     assert models._sanitize_category_name("Test Category") == "TEST_CATEGORY"

@@ -2,8 +2,8 @@ from unittest.mock import patch, AsyncMock, MagicMock
 import httpx
 import pytest, asyncio
 
-from src.env import BUGCROWD_API_KEY, API_BASE_URL
-from src.handlers.bugcrowd_api import BugCrowdAPI
+from bugbounty_gpt.env import BUGCROWD_API_KEY, API_BASE_URL
+from bugbounty_gpt.handlers.bugcrowd_api import BugCrowdAPI
 
 def test_get_headers():
     headers = BugCrowdAPI._get_headers()
@@ -27,7 +27,7 @@ async def test_fetch_page():
 @pytest.mark.asyncio
 async def test_fetch_submissions():
     params = {"param": "value"}
-    with patch("src.handlers.bugcrowd_api.BugCrowdAPI._fetch_page", new_callable=AsyncMock) as mock_fetch_page:
+    with patch("bugbounty_gpt.handlers.bugcrowd_api.BugCrowdAPI._fetch_page", new_callable=AsyncMock) as mock_fetch_page:
         mock_fetch_page.side_effect = [["submission1", "submission2"], []]
         submissions = await BugCrowdAPI.fetch_submissions(params)
         assert submissions == ["submission1", "submission2"]
