@@ -1,13 +1,15 @@
 import logging
+from typing import Any, Dict, List, Optional, Sequence
 
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from bugbounty_gpt.db.models import Submission
+from bugbounty_gpt.db.models import ReportCategory, Submission, SubmissionState
 
 logger = logging.getLogger(__name__)
 
 
-async def _find_submission_by_id(session, submission_id):
+async def find_submission_by_id(session: AsyncSession, submission_id: str) -> Optional[Submission]:
     """
     Fetches a submission from the database by its ID.
 
@@ -21,7 +23,7 @@ async def _find_submission_by_id(session, submission_id):
     return result.scalar_one_or_none()
 
 
-async def insert_submission(session, submission_data):
+async def insert_submission(session: AsyncSession, submission_data: Dict[str, Any]) -> None:
     """
     Inserts a new submission into the database if it does not exist.
 
@@ -30,19 +32,19 @@ async def insert_submission(session, submission_data):
     """
     submission_id = submission_data["submission_id"]
     logger.info(f"Checking if submission {submission_id} already exists.")
-    existing_submission = await _find_submission_by_id(session, submission_id)
+    existing_submission = await find_submission_by_id(session, submission_id)
 
     if existing_submission:
         logger.info(f"Submission {submission_id} already exists, skipping insert.")
-    else:
-        logger.info(f"Inserting submission {submission_id}.")
-        async with session:
-            submission = Submission(**submission_data)
-            session.add(submission)
-            await session.commit()
+        return
+
+    logger.info(f"Inserting submission {submission_id}.")
+    submission = Submission(**submission_data)
+    session.add(submission)
+    await session.commit()
 
 
-async def update_submission_state(session, submission_id, new_state):
+async def update_submission_state(session: AsyncSession, submission_id: str, new_state: SubmissionState) -> bool:
     """
     Updates the state of a submission in the database.
 
@@ -52,17 +54,18 @@ async def update_submission_state(session, submission_id, new_state):
     :return: True if the update was successful, False otherwise.
     """
     logger.info(f"Updating submission {submission_id}.")
-    async with session:
-        submission = await _find_submission_by_id(session, submission_id)
-        if submission:
-            submission.submission_state = new_state
-            await session.commit()
-            return True
-        else:
-            return False
+    submission = await find_submission_by_id(session, submission_id)
+    if not submission:
+        return False
+
+    submission.submission_state = new_state
+    await session.commit()
+    return True
 
 
-async def fetch_submission_by_state_and_classification(session, states, classifications):
+async def fetch_submission_by_state_and_classification(
+    session: AsyncSession, states: List[SubmissionState], classifications: List[ReportCategory]
+) -> Sequence[Submission]:
     """
     Fetches submissions that meet certain state and classification criteria.
 
@@ -72,22 +75,8 @@ async def fetch_submission_by_state_and_classification(session, states, classifi
     :return: List of submissions that meet the criteria.
     """
     logger.info("Fetching submissions meeting states & classification criteria.")
-    async with session:
-        stmt = select(Submission).filter(
-            Submission.submission_state.in_(states), Submission.classification.in_(classifications)
-        )
-        result = await session.execute(stmt)
-        return result.scalars().all()
-
-
-async def fetch_submission_by_id(session, submission_id):
-    """
-    Fetches a submission from the database by its ID.
-
-    :param session: Database session object.
-    :param submission_id: ID of the submission to be fetched.
-    :return: Submission object if found, None otherwise.
-    """
-    logger.info(f"Fetching submission {submission_id} from database.")
-    async with session:
-        return session.query(Submission).filter(Submission.submission_id == submission_id).first()
+    stmt = select(Submission).filter(
+        Submission.submission_state.in_(states), Submission.classification.in_(classifications)
+    )
+    result = await session.execute(stmt)
+    return result.scalars().all()

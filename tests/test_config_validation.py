@@ -1,6 +1,6 @@
 import pytest
 
-import bugbounty_gpt.env as env
+from bugbounty_gpt import env
 
 
 def test_sanitize_category():

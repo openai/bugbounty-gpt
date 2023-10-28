@@ -1,4 +1,4 @@
-import bugbounty_gpt.db.models as models
+from bugbounty_gpt.db import models
 
 
 def test_sanitize_category_name():

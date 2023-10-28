@@ -2,6 +2,7 @@ import logging
 import time
 
 from sqlalchemy import create_engine, inspect
+from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError
 
 from alembic import command
@@ -12,9 +13,9 @@ logger = logging.getLogger(__name__)
 logger.info("Migration auto-init script activated. To turn this off, re-build without the EPHEMERAL_DB arg.")
 time.sleep(2)
 
-SYNCHRONOUS_SQLALCHEMY_URL = SQLALCHEMY_URL.replace("+asyncpg", "")
+SYNCHRONOUS_SQLALCHEMY_URL = SQLALCHEMY_URL.replace("+asyncpg", "")  # type: ignore
 
-engine = create_engine(SYNCHRONOUS_SQLALCHEMY_URL)
+_ENGINE = create_engine(SYNCHRONOUS_SQLALCHEMY_URL)
 
 # Number of attempts to connect to the database
 MAX_ATTEMPTS = 5
@@ -22,7 +23,7 @@ MAX_ATTEMPTS = 5
 WAIT_TIME = 5
 
 
-def check_and_init_submission_table(engine):
+def check_and_init_submission_table(engine: Engine) -> None:
     """
     Checks if the 'submission' table exists, and if not, runs an alembic migration to create it.
 
@@ -36,7 +37,7 @@ def check_and_init_submission_table(engine):
         command.upgrade(alembic_cfg, "head")
 
 
-def attempt_database_connection(engine):
+def attempt_database_connection(engine: Engine) -> None:
     """
     Attempts to connect to the database, and initializes the submission table if it does not exist.
 
@@ -54,8 +55,8 @@ def attempt_database_connection(engine):
     else:
         # This block executes if the loop completes without a 'break' statement (i.e., all attempts failed)
         logger.error("Failed to connect to database after all attempts. Exiting.")
-        raise Exception("Unable to connect to database")
+        raise RuntimeError("Unable to connect to database")
 
 
 # Starting the connection attempts
-attempt_database_connection(engine)
+attempt_database_connection(_ENGINE)

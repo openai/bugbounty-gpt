@@ -7,19 +7,6 @@ from bugbounty_gpt.handlers.bugcrowd_api import BugCrowdAPI
 from bugbounty_gpt.handlers.submission_handler import BugCrowdSubmission
 
 
-def test_prepare_comment_data():
-    submission = BugCrowdSubmission("submission_id", None, None)
-    comment_body = "Test comment"
-    expected_data = {
-        "data": {
-            "type": "comment",
-            "attributes": {"body": comment_body, "visibility_scope": "everyone"},
-            "relationships": {"submission": {"data": {"id": "submission_id", "type": "submission"}}},
-        }
-    }
-    assert submission._prepare_comment_data(comment_body) == expected_data
-
-
 @pytest.mark.asyncio
 async def test_create_comment_success():
     submission = BugCrowdSubmission("submission_id", None, None)

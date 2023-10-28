@@ -1,16 +1,17 @@
 import logging
 import os
 import re
+from typing import Any, Dict, List
 
 import yaml
 
 logger = logging.getLogger(__name__)
 
 
-def load_config() -> dict:
+def load_config() -> Dict[str, Any]:
     """Loads the configuration from the YAML file."""
     config_path = os.path.join(os.path.dirname(__file__), "../config.yaml")
-    with open(config_path, "r") as file:
+    with open(config_path, "r", encoding="utf-8") as file:
         return yaml.safe_load(file)
 
 
@@ -19,18 +20,18 @@ def sanitize_category(category: str) -> str:
     return re.sub(r"\W|^(?=\d)", "_", category).upper().strip()
 
 
-def sanitize_categories(categories: list) -> list:
+def sanitize_categories(categories: List[str]) -> List[str]:
     """Sanitizes a list of category names using sanitize_category."""
     return [sanitize_category(category) for category in categories]
 
 
-def validate_valid_categories(config: dict):
+def validate_valid_categories(config: Dict[str, Any]) -> None:
     """Checks that the 'valid' categories are defined in the configuration."""
     if "valid" not in config["categories"]:
         raise ValueError("Missing 'valid' categories in configuration.")
 
 
-def validate_response_categories_subset(config: dict):
+def validate_response_categories_subset(config: Dict[str, Any]) -> None:
     """Ensures that the response categories are a subset of the valid categories."""
     valid_categories = set(config["categories"]["valid"])
     response_categories = {item["name"] for item in config["categories"]["response"]}
@@ -38,14 +39,14 @@ def validate_response_categories_subset(config: dict):
         raise ValueError("Response categories must be a subset of valid categories.")
 
 
-def validate_response_pairs(config: dict):
+def validate_response_pairs(config: Dict[str, Any]) -> None:
     """Ensures that each response category contains both a 'name' and 'response' key."""
     for item in config["categories"]["response"]:
         if "name" not in item or "response" not in item:
             raise ValueError("Each response category must contain 'name' and 'response' keys.")
 
 
-def validate_config(config: dict):
+def validate_config(config: Dict[str, Any]) -> None:
     """Validates the entire configuration."""
     validate_valid_categories(config)
     validate_response_categories_subset(config)

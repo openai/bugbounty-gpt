@@ -25,7 +25,7 @@ async def test_fetch_page():
         return_value={"data": ["submission1", "submission2"]}
     )  # Use MagicMock for the synchronous json method
 
-    with patch.object(httpx.AsyncClient, "get", return_value=mock_response) as mock_get:
+    with patch.object(httpx.AsyncClient, "get", return_value=mock_response):
         submissions = await BugCrowdAPI._fetch_page(url, params, page_limit, page_offset)  # await the async function
         assert submissions == ["submission1", "submission2"]  # No await here
 
@@ -50,7 +50,7 @@ async def test_fetch_submission():
         return_value={"data": "submission_data"}
     )  # Use MagicMock for the synchronous json method
 
-    with patch.object(httpx.AsyncClient, "get", return_value=mock_response) as mock_get:
+    with patch.object(httpx.AsyncClient, "get", return_value=mock_response):
         submission = await BugCrowdAPI.fetch_submission(submission_id)
         assert submission == {"data": "submission_data"}  # No await here
 

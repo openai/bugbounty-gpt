@@ -1,6 +1,7 @@
 import json
 import logging
 import time
+from typing import Any, Dict, List, Optional
 
 import httpx
 
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class BugCrowdAPI:
     @staticmethod
-    def _get_headers(content_type="application/vnd.bugcrowd+json"):
+    def _get_headers(content_type: str = "application/vnd.bugcrowd+json") -> Dict[str, Any]:
         """
         Returns common headers for Bugcrowd API requests.
 
@@ -21,7 +22,7 @@ class BugCrowdAPI:
         return {"Accept": content_type, "Authorization": f"Token {BUGCROWD_API_KEY}"}
 
     @staticmethod
-    async def _fetch_page(url, params, page_limit, page_offset):
+    async def _fetch_page(url: str, params: Dict[str, Any], page_limit: int, page_offset: int) -> List[Dict[str, Any]]:
         """
         Fetches a page of data from the specified URL with pagination.
 
@@ -48,7 +49,7 @@ class BugCrowdAPI:
         return data["data"] if data["data"] else []
 
     @staticmethod
-    async def fetch_submissions(params):
+    async def fetch_submissions(params: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
         Fetches all submissions from BugCrowd.
 
@@ -72,10 +73,10 @@ class BugCrowdAPI:
 
             time.sleep(delay)  # Add a delay between API calls
 
-        return all_submissions if all_submissions else None
+        return all_submissions
 
     @staticmethod
-    async def fetch_submission(submission_id):
+    async def fetch_submission(submission_id: str) -> Optional[Dict[str, Any]]:
         """
         Fetches a specific submission from BugCrowd.
 
@@ -94,7 +95,7 @@ class BugCrowdAPI:
                 return None
 
     @staticmethod
-    async def create_comment(comment_data):
+    async def create_comment(comment_data: Dict[str, Any]) -> httpx.Response:
         """
         Creates a comment using the provided data.
 
@@ -113,7 +114,7 @@ class BugCrowdAPI:
             return response
 
     @staticmethod
-    async def patch_submission(submission_id, data):
+    async def patch_submission(submission_id: str, data: Dict[str, Any]) -> httpx.Response:
         """
         Patches a specific submission on BugCrowd.
 
@@ -127,10 +128,4 @@ class BugCrowdAPI:
         headers["Content-Type"] = "application/vnd.bugcrowd.v4+json"
 
         async with httpx.AsyncClient() as client:
-            response = await client.patch(url, headers=headers, data=json.dumps(data))
-
-            if response.status_code != 200:
-                logger.error(f"Failed to patch submission {submission_id}. Status code: {response.status_code}")
-                return None
-
-        return response
+            return await client.patch(url, headers=headers, data=data)
