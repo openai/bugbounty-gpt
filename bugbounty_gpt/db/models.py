@@ -1,9 +1,14 @@
 from enum import Enum
-from bugbounty_gpt.env import VALID_CATEGORIES
-from sqlalchemy import Column, DateTime, Integer, String, Text, func, Enum as SqlEnum
+
+from sqlalchemy import Column, DateTime
+from sqlalchemy import Enum as SqlEnum
+from sqlalchemy import String, Text, func
 from sqlalchemy.orm import declarative_base
 
+from bugbounty_gpt.env import VALID_CATEGORIES
+
 Base = declarative_base()
+
 
 def _sanitize_category_name(category_name):
     """
@@ -14,6 +19,7 @@ def _sanitize_category_name(category_name):
     """
     return category_name.replace(" ", "_").upper()
 
+
 def _create_enum_members(categories):
     """
     Creates enum members from the given categories.
@@ -23,12 +29,15 @@ def _create_enum_members(categories):
     """
     return {_sanitize_category_name(category): category for category in categories}
 
-ReportCategory = Enum('ReportCategory', _create_enum_members(VALID_CATEGORIES))
+
+ReportCategory = Enum("ReportCategory", _create_enum_members(VALID_CATEGORIES))
+
 
 class SubmissionState(Enum):
     NEW = 1
     UPDATED_OUT_OF_BAND = 2
     UPDATED = 3
+
 
 class Submission(Base):
     """
@@ -43,6 +52,7 @@ class Submission(Base):
         created_at: Timestamp of submission creation.
         updated_at: Timestamp of the last update to the submission.
     """
+
     __tablename__ = "submission"
 
     submission_id = Column(String(100), primary_key=True)

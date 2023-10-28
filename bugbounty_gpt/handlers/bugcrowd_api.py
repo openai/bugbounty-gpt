@@ -1,24 +1,24 @@
 import json
-import httpx
 import logging
 import time
+
+import httpx
+
 from bugbounty_gpt.env import API_BASE_URL, BUGCROWD_API_KEY
 
 logger = logging.getLogger(__name__)
 
+
 class BugCrowdAPI:
     @staticmethod
-    def _get_headers(content_type='application/vnd.bugcrowd+json'):
+    def _get_headers(content_type="application/vnd.bugcrowd+json"):
         """
         Returns common headers for Bugcrowd API requests.
 
         :param content_type: Content type for the Accept header. Default is 'application/vnd.bugcrowd+json'.
         :return: Dictionary containing the required headers.
         """
-        return {
-            'Accept': content_type,
-            'Authorization': f'Token {BUGCROWD_API_KEY}'
-        }
+        return {"Accept": content_type, "Authorization": f"Token {BUGCROWD_API_KEY}"}
 
     @staticmethod
     async def _fetch_page(url, params, page_limit, page_offset):
@@ -32,8 +32,8 @@ class BugCrowdAPI:
         :return: List of data fetched from the page or an empty list if there is an error.
         """
         pagination_params = {
-            'page[limit]': page_limit,
-            'page[offset]': page_offset,
+            "page[limit]": page_limit,
+            "page[offset]": page_offset,
         }
         complete_params = {**params, **pagination_params}
 
@@ -45,7 +45,7 @@ class BugCrowdAPI:
                 logger.error(f"Error: Unable to decode JSON. {e}")
                 return []
 
-        return data['data'] if data['data'] else []
+        return data["data"] if data["data"] else []
 
     @staticmethod
     async def fetch_submissions(params):
@@ -56,7 +56,7 @@ class BugCrowdAPI:
         :return: List of all submissions or None if no submissions found.
         """
         logger.info("Fetching submissions from BugCrowd.")
-        url = f'{API_BASE_URL}/submissions'
+        url = f"{API_BASE_URL}/submissions"
         page_limit = 100
         page_offset = 0
         all_submissions = []
@@ -83,7 +83,7 @@ class BugCrowdAPI:
         :return: Submission data as a dictionary or None if an error occurred.
         """
         logger.info(f"Fetching submission {submission_id} from BugCrowd.")
-        url = f'{API_BASE_URL}/submissions/{submission_id}'
+        url = f"{API_BASE_URL}/submissions/{submission_id}"
 
         async with httpx.AsyncClient() as client:
             response = await client.get(url, headers=BugCrowdAPI._get_headers())
@@ -101,8 +101,8 @@ class BugCrowdAPI:
         :param comment_data: Data for the comment.
         :return: Response object from the comment creation operation.
         """
-        url = f'{API_BASE_URL}/comments'
-        headers = BugCrowdAPI._get_headers('application/json')
+        url = f"{API_BASE_URL}/comments"
+        headers = BugCrowdAPI._get_headers("application/json")
 
         async with httpx.AsyncClient() as client:
             response = await client.post(url, headers=headers, json=comment_data)
@@ -122,9 +122,9 @@ class BugCrowdAPI:
         :return: Response object from the patch operation or None if an error occurred.
         """
         logger.info(f"Patching submission {submission_id} on BugCrowd.")
-        url = f'{API_BASE_URL}/submissions/{submission_id}'
+        url = f"{API_BASE_URL}/submissions/{submission_id}"
         headers = BugCrowdAPI._get_headers()
-        headers['Content-Type'] = 'application/vnd.bugcrowd.v4+json'
+        headers["Content-Type"] = "application/vnd.bugcrowd.v4+json"
 
         async with httpx.AsyncClient() as client:
             response = await client.patch(url, headers=headers, data=json.dumps(data))

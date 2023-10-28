@@ -1,8 +1,11 @@
-from bugbounty_gpt.db.models import Submission
-from sqlalchemy import select
 import logging
 
+from sqlalchemy import select
+
+from bugbounty_gpt.db.models import Submission
+
 logger = logging.getLogger(__name__)
+
 
 async def _find_submission_by_id(session, submission_id):
     """
@@ -17,6 +20,7 @@ async def _find_submission_by_id(session, submission_id):
     result = await session.execute(stmt)
     return result.scalar_one_or_none()
 
+
 async def insert_submission(session, submission_data):
     """
     Inserts a new submission into the database if it does not exist.
@@ -24,7 +28,7 @@ async def insert_submission(session, submission_data):
     :param session: Database session object.
     :param submission_data: Dictionary containing the submission data.
     """
-    submission_id = submission_data['submission_id']
+    submission_id = submission_data["submission_id"]
     logger.info(f"Checking if submission {submission_id} already exists.")
     existing_submission = await _find_submission_by_id(session, submission_id)
 
@@ -36,6 +40,7 @@ async def insert_submission(session, submission_data):
             submission = Submission(**submission_data)
             session.add(submission)
             await session.commit()
+
 
 async def update_submission_state(session, submission_id, new_state):
     """
@@ -56,6 +61,7 @@ async def update_submission_state(session, submission_id, new_state):
         else:
             return False
 
+
 async def fetch_submission_by_state_and_classification(session, states, classifications):
     """
     Fetches submissions that meet certain state and classification criteria.
@@ -68,11 +74,11 @@ async def fetch_submission_by_state_and_classification(session, states, classifi
     logger.info("Fetching submissions meeting states & classification criteria.")
     async with session:
         stmt = select(Submission).filter(
-            Submission.submission_state.in_(states),
-            Submission.classification.in_(classifications)
+            Submission.submission_state.in_(states), Submission.classification.in_(classifications)
         )
         result = await session.execute(stmt)
         return result.scalars().all()
+
 
 async def fetch_submission_by_id(session, submission_id):
     """

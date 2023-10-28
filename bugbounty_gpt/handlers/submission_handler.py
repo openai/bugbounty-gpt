@@ -1,9 +1,11 @@
-from bugbounty_gpt.handlers.bugcrowd_api import BugCrowdAPI
-from bugbounty_gpt.env import RESPONSES
-import logging
 import json
+import logging
+
+from bugbounty_gpt.env import RESPONSES
+from bugbounty_gpt.handlers.bugcrowd_api import BugCrowdAPI
 
 logger = logging.getLogger(__name__)
+
 
 class BugCrowdSubmission:
     def __init__(self, submission_id, classification, reasoning):
@@ -26,17 +28,7 @@ class BugCrowdSubmission:
         :return: Dictionary containing the required data.
         """
         return {
-            'data': {
-                'type': 'submission',
-                'relationships': {
-                    'assignee': {
-                        'data': {
-                            'id': user_id,
-                            'type': 'identity'
-                        }
-                    }
-                }
-            }
+            "data": {"type": "submission", "relationships": {"assignee": {"data": {"id": user_id, "type": "identity"}}}}
         }
 
     def _handle_assign_response(self, response, user_id):
@@ -49,7 +41,9 @@ class BugCrowdSubmission:
         if response.status_code == 200:
             logger.info(f"Submission {self.submission_id} assigned to user {user_id}.")
         else:
-            logger.error(f"Unable to assign submission {self.submission_id} to user {user_id}. Status code: {response.status_code}")
+            logger.error(
+                f"Unable to assign submission {self.submission_id} to user {user_id}. Status code: {response.status_code}"
+            )
 
     async def assign_to_user(self, user_id):
         """
@@ -68,27 +62,22 @@ class BugCrowdSubmission:
         :return: True if the submission is new, False otherwise.
         """
         submission_data = await BugCrowdAPI.fetch_submission(self.submission_id)
-        submission_state = submission_data['data']['attributes']['state']
-        return submission_state.lower() == 'new'
+        submission_state = submission_data["data"]["attributes"]["state"]
+        return submission_state.lower() == "new"
 
     async def close_submission(self):
         """
         Closes the submission on BugCrowd.
         """
         logger.info(f"Closing submission {self.submission_id} on BugCrowd.")
-        data = {
-            'data': {
-                'type': 'submission',
-                'attributes': {
-                    'state': 'not_applicable'
-                }
-            }
-        }
+        data = {"data": {"type": "submission", "attributes": {"state": "not_applicable"}}}
         response = await BugCrowdAPI.patch_submission(self.submission_id, data)
         if response.status_code != 200:
-            raise Exception(f"Failed to close submission {self.submission_id}. Status code: {response.status_code}, Content: {response.content}")
+            raise Exception(
+                f"Failed to close submission {self.submission_id}. Status code: {response.status_code}, Content: {response.content}"
+            )
 
-    def _prepare_comment_data(self, comment_body, visibility_scope='everyone'):
+    def _prepare_comment_data(self, comment_body, visibility_scope="everyone"):
         """
         Prepares data to create a comment.
 
@@ -99,18 +88,8 @@ class BugCrowdSubmission:
         return {
             "data": {
                 "type": "comment",
-                "attributes": {
-                    "body": comment_body,
-                    "visibility_scope": visibility_scope
-                },
-                "relationships": {
-                    "submission": {
-                        "data": {
-                            "id": self.submission_id,
-                            "type": "submission"
-                        }
-                    }
-                }
+                "attributes": {"body": comment_body, "visibility_scope": visibility_scope},
+                "relationships": {"submission": {"data": {"id": self.submission_id, "type": "submission"}}},
             }
         }
 
@@ -126,7 +105,7 @@ class BugCrowdSubmission:
             error_message = "An error occurred, but the response is not a valid JSON object."
         logger.error("Error: " + error_message)
 
-    async def create_comment(self, comment_body, visibility_scope='everyone'):
+    async def create_comment(self, comment_body, visibility_scope="everyone"):
         """
         Creates a comment for the submission on BugCrowd.
 

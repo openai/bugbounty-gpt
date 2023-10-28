@@ -1,10 +1,13 @@
-import openai
-import time
-import logging
 import asyncio
-from bugbounty_gpt.env import VALID_CATEGORIES, OPENAI_PROMPT, OPENAI_MODEL, DEFAULT_CATEGORY
+import logging
+import time
+
+import openai
+
+from bugbounty_gpt.env import DEFAULT_CATEGORY, OPENAI_MODEL, OPENAI_PROMPT, VALID_CATEGORIES
 
 logger = logging.getLogger(__name__)
+
 
 class OpenAIHandler:
     @staticmethod
@@ -15,7 +18,7 @@ class OpenAIHandler:
         :param input_string: The input string to sanitize.
         :return: The sanitized string.
         """
-        return input_string.strip().replace(' ', '_').upper()
+        return input_string.strip().replace(" ", "_").upper()
 
     @staticmethod
     def _build_request_data(submission_content):
@@ -29,10 +32,7 @@ class OpenAIHandler:
             "model": OPENAI_MODEL,
             "temperature": 0,
             "max_tokens": 512,
-            "messages": [
-                {"role": "system", "content": OPENAI_PROMPT},
-                {"role": "user", "content": submission_content}
-            ]
+            "messages": [{"role": "system", "content": OPENAI_PROMPT}, {"role": "user", "content": submission_content}],
         }
 
     @staticmethod
@@ -56,7 +56,7 @@ class OpenAIHandler:
         """
         try:
             response_text = response.choices[0].message.content
-            judgement, explanation = response_text.rsplit('\n', 1)
+            judgement, explanation = response_text.rsplit("\n", 1)
             sanitized_judgement = OpenAIHandler._classifications_sanitization(judgement)
             if sanitized_judgement in VALID_CATEGORIES:
                 return sanitized_judgement, explanation.strip()
