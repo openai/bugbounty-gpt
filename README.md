@@ -30,7 +30,7 @@ As it stands, there is a Dockerfile within the root directory of this repository
 
 To actually test your configuration, it is reccomended that you take utilize docker-compose to quickly spin-up and clear-out an ephermal database. Connect locally to the database with `psql` and inspect classifications.
 
-If Docker isn't your cup of tea, you can also install the requirements locally and run the classifier/responder via `python -m src.main`
+If Docker isn't your cup of tea, you can also install the requirements locally and run the classifier/responder via `python -m bugbounty_gpt`
 
 ### Configuration
 

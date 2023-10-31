@@ -12,7 +12,7 @@ packages = [
 include = ["bugbounty_gpt/CHANGELOG.md", "bugbounty_gpt/py.typed"]
 
 [tool.poetry.dependencies]
-python = "==3.8.*"
+python = "==3.11.*"
 alembic = "1.12.1"
 asyncpg = "0.28.0"
 httpx = "0.25.0"
