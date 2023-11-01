@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
     - name: Checkout Source Code
       uses: actions/checkout@v3
 
@@ -27,9 +26,16 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry
 
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ./.venv
+        key: poetry-v1-${{ hashFiles('poetry.lock') }}
+        restore-keys: |
+          poetry-v1-
+
     - name: Dependency installation
-      run: |
-        poetry install
+      run: poetry install
 
     - name: Run Black
       run: poetry run black . --check
