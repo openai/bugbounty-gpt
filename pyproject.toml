@@ -51,9 +51,8 @@ check = "task security && task style && task types && task lint && task lint_tes
 lint = "pylint bugbounty_gpt"
 lint_tests = "pylint --disable=\"R0201,W0201,W0212,W0621,W0404,C0302\" tests"
 code_safety = "bandit -r -q bugbounty_gpt -c pyproject.toml"
-# Security item #42194 is related to encrypted values in sqlalchemy-utils, which we don't use
 security = """
-poetry export -f requirements.txt | poetry run safety check --bare --stdin -i 42194 -i 51668\
+poetry export -f requirements.txt | poetry run safety check --bare --stdin \
 && task code_safety
 """
 style = """
