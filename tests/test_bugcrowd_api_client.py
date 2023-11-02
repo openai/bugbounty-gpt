@@ -24,13 +24,18 @@ async def test_fetch_page():
         submissions = await BugCrowdAPI._fetch_page(url, params, page_limit, page_offset) # await the async function
         assert submissions == ["submission1", "submission2"]  # No await here
 
+
 @pytest.mark.asyncio
-async def test_fetch_submissions():
+async def test_fetch_submissions(mocker, mock_async_sleep):
     params = {"param": "value"}
-    with patch("bugbounty_gpt.handlers.bugcrowd_api.BugCrowdAPI._fetch_page", new_callable=AsyncMock) as mock_fetch_page:
-        mock_fetch_page.side_effect = [["submission1", "submission2"], []]
-        submissions = await BugCrowdAPI.fetch_submissions(params)
-        assert submissions == ["submission1", "submission2"]
+    mock_fetch_page = mocker.patch(
+        "bugbounty_gpt.handlers.bugcrowd_api.BugCrowdAPI._fetch_page",
+        new_callable=AsyncMock,
+    )
+    mock_fetch_page.side_effect = [["submission1", "submission2"], []]
+    submissions = await BugCrowdAPI.fetch_submissions(params)
+    assert submissions == ["submission1", "submission2"]
+
 
 @pytest.mark.asyncio
 async def test_fetch_submission():
