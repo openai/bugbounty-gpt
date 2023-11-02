@@ -16,7 +16,10 @@ def test_build_request_data():
         "model": OPENAI_MODEL,
         "temperature": 0,
         "max_tokens": 512,
-        "messages": [{"role": "system", "content": OPENAI_PROMPT}, {"role": "user", "content": submission_content}],
+        "messages": [
+            {"role": "system", "content": OPENAI_PROMPT},
+            {"role": "user", "content": submission_content},
+        ],
     }
     assert OpenAIHandler._build_request_data(submission_content) == expected_data
 
@@ -39,7 +42,13 @@ def test_handle_response_success():
                 type(
                     "Choice",
                     (object,),
-                    {"message": type("Message", (object,), {"content": "Policy or Content Complaints\nExplanation"})},
+                    {
+                        "message": type(
+                            "Message",
+                            (object,),
+                            {"content": "Policy or Content Complaints\nExplanation"},
+                        )
+                    },
                 )
             ]
         },
@@ -58,7 +67,13 @@ def test_handle_response_unsanitized_category():
                 type(
                     "Choice",
                     (object,),
-                    {"message": type("Message", (object,), {"content": "INVALID_CATEGORY\nExplanation"})},
+                    {
+                        "message": type(
+                            "Message",
+                            (object,),
+                            {"content": "INVALID_CATEGORY\nExplanation"},
+                        )
+                    },
                 )
             ]
         },
@@ -97,7 +112,9 @@ async def test_classify_submission_success():
                         (object,),
                         {
                             "message": type(
-                                "Message", (object,), {"content": " Policy or Content Complaints\nExplanation"}
+                                "Message",
+                                (object,),
+                                {"content": " Policy or Content Complaints\nExplanation"},
                             )
                         },
                     )

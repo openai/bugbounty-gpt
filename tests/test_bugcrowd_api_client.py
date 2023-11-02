@@ -34,7 +34,8 @@ async def test_fetch_page():
 async def test_fetch_submissions():
     params = {"param": "value"}
     with patch(
-        "bugbounty_gpt.handlers.bugcrowd_api.BugCrowdAPI._fetch_page", new_callable=AsyncMock
+        "bugbounty_gpt.handlers.bugcrowd_api.BugCrowdAPI._fetch_page",
+        new_callable=AsyncMock,
     ) as mock_fetch_page:
         mock_fetch_page.side_effect = [["submission1", "submission2"], []]
         submissions = await BugCrowdAPI.fetch_submissions(params)

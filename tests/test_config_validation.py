@@ -32,7 +32,12 @@ def test_validate_response_categories_subset():
     }
     env.validate_response_categories_subset(valid_config)  # Should not raise an exception
 
-    invalid_config = {"categories": {"valid": ["Functional Bugs"], "response": [{"name": "Customer Support"}]}}
+    invalid_config = {
+        "categories": {
+            "valid": ["Functional Bugs"],
+            "response": [{"name": "Customer Support"}],
+        }
+    }
     with pytest.raises(ValueError):
         env.validate_response_categories_subset(invalid_config)
 

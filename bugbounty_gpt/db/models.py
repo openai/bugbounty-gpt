@@ -66,4 +66,8 @@ class Submission(Base):
     classification = mapped_column(SqlEnum(ReportCategory))
     submission_state = mapped_column(SqlEnum(SubmissionState))
     created_at = mapped_column(DateTime, server_default=func.CURRENT_TIMESTAMP())
-    updated_at = mapped_column(DateTime, server_default=func.CURRENT_TIMESTAMP(), onupdate=func.CURRENT_TIMESTAMP())
+    updated_at = mapped_column(
+        DateTime,
+        server_default=func.CURRENT_TIMESTAMP(),
+        onupdate=func.CURRENT_TIMESTAMP(),
+    )

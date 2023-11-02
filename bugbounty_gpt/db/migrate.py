@@ -33,7 +33,11 @@ def check_and_init_submission_table(engine: Engine) -> None:
     if "submission" not in inspector.get_table_names():
         logger.info("Submission table not found - attempting alembic auto-generate & init.")
         alembic_cfg = Config("/usr/src/app/alembic.ini")
-        command.revision(alembic_cfg, autogenerate=True, message="Auto-generated migration for 'submission' table.")
+        command.revision(
+            alembic_cfg,
+            autogenerate=True,
+            message="Auto-generated migration for 'submission' table.",
+        )
         command.upgrade(alembic_cfg, "head")
 
 

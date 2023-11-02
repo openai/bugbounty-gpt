@@ -11,7 +11,12 @@ logger = logging.getLogger(__name__)
 
 
 class BugCrowdSubmission:
-    def __init__(self, submission_id: str, classification: ReportCategory, reasoning: Optional[str]) -> None:
+    def __init__(
+        self,
+        submission_id: str,
+        classification: ReportCategory,
+        reasoning: Optional[str],
+    ) -> None:
         """
         Initializes a BugCrowdSubmission object.
 
@@ -30,7 +35,10 @@ class BugCrowdSubmission:
         :param user_id: ID of the user to be assigned.
         """
         data = {
-            "data": {"type": "submission", "relationships": {"assignee": {"data": {"id": user_id, "type": "identity"}}}}
+            "data": {
+                "type": "submission",
+                "relationships": {"assignee": {"data": {"id": user_id, "type": "identity"}}},
+            }
         }
 
         response = await BugCrowdAPI.patch_submission(self.submission_id, data)
@@ -82,7 +90,10 @@ class BugCrowdSubmission:
         comment_data = {
             "data": {
                 "type": "comment",
-                "attributes": {"body": comment_body, "visibility_scope": visibility_scope},
+                "attributes": {
+                    "body": comment_body,
+                    "visibility_scope": visibility_scope,
+                },
                 "relationships": {"submission": {"data": {"id": self.submission_id, "type": "submission"}}},
             }
         }

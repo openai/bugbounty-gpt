@@ -30,7 +30,11 @@ async def process_new_submissions() -> None:
     """
     Fetch and process new submissions that are not duplicates and store them in the database.
     """
-    params = {"filter[program]": FILTER_PROGRAM, "filter[state]": "new", "filter[duplicate]": "false"}
+    params = {
+        "filter[program]": FILTER_PROGRAM,
+        "filter[state]": "new",
+        "filter[duplicate]": "false",
+    }
 
     submissions = await BugCrowdAPI.fetch_submissions(params)
     if not submissions:
@@ -66,12 +70,16 @@ async def process_in_scope_submissions() -> None:
         states = [SubmissionState.NEW]
         classifications = RESPONSE_CATEGORIES  # Using the RESPONSE_CATEGORIES from config
         in_scope_submissions = await db_handler.fetch_submission_by_state_and_classification(
-            session, states, classifications  # type: ignore
+            session,
+            states,
+            classifications,  # type: ignore
         )
 
         for submission_data in in_scope_submissions:
             submission = BugCrowdSubmission(
-                submission_data.submission_id, submission_data.classification, submission_data.reasoning
+                submission_data.submission_id,
+                submission_data.classification,
+                submission_data.reasoning,
             )
 
             if await submission.is_submission_new():
@@ -83,7 +91,9 @@ async def process_in_scope_submissions() -> None:
                     await db_handler.update_submission_state(session, submission.submission_id, SubmissionState.UPDATED)
             else:
                 await db_handler.update_submission_state(
-                    session, submission.submission_id, SubmissionState.UPDATED_OUT_OF_BAND
+                    session,
+                    submission.submission_id,
+                    SubmissionState.UPDATED_OUT_OF_BAND,
                 )
 
 

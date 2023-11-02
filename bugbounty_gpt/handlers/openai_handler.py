@@ -5,7 +5,12 @@ from typing import Any, Dict, Tuple
 
 import openai
 
-from bugbounty_gpt.env import DEFAULT_CATEGORY, OPENAI_MODEL, OPENAI_PROMPT, VALID_CATEGORIES
+from bugbounty_gpt.env import (
+    DEFAULT_CATEGORY,
+    OPENAI_MODEL,
+    OPENAI_PROMPT,
+    VALID_CATEGORIES,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +41,10 @@ class OpenAIHandler:
             "model": OPENAI_MODEL,
             "temperature": 0,
             "max_tokens": 512,
-            "messages": [{"role": "system", "content": OPENAI_PROMPT}, {"role": "user", "content": submission_content}],
+            "messages": [
+                {"role": "system", "content": OPENAI_PROMPT},
+                {"role": "user", "content": submission_content},
+            ],
         }
 
     @staticmethod
@@ -48,7 +56,10 @@ class OpenAIHandler:
         :return: A tuple containing the default category and an error message.
         """
         logger.error(f"An error occurred during the OpenAI request: {error}")
-        return DEFAULT_CATEGORY, "An error occurred during classification. Please check application logs."
+        return (
+            DEFAULT_CATEGORY,
+            "An error occurred during classification. Please check application logs.",
+        )
 
     @staticmethod
     def _handle_response(response: Any) -> ClassificationResponse:

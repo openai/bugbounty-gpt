@@ -26,10 +26,18 @@ async def test_create_comment_error_handling(caplog):
         mock_response = type(
             "Response",
             (object,),
-            {"status_code": error_code, "json": lambda: {"errors": [{"detail": "error message"}]}},
+            {
+                "status_code": error_code,
+                "json": lambda: {"errors": [{"detail": "error message"}]},
+            },
         )
 
-        with patch.object(BugCrowdAPI, "create_comment", new_callable=AsyncMock, return_value=mock_response):
+        with patch.object(
+            BugCrowdAPI,
+            "create_comment",
+            new_callable=AsyncMock,
+            return_value=mock_response,
+        ):
             with caplog.at_level(logging.ERROR):  # Capture ERROR-level logs
                 await submission.create_comment(comment_body)
 

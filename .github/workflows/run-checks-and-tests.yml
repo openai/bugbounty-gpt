@@ -37,29 +37,21 @@ jobs:
     - name: Dependency installation
       run: poetry install
 
-    - name: Run Black
-      run: poetry run black . --check
-
-    - name: Run isort
-      run: poetry run isort . --check
-
-    - name: Run bandit
-      run: poetry run bandit -r ${{ inputs.module }} -c pyproject.toml
-
-    - name: Lint (source)
-      run: poetry run pylint ${{ inputs.module }} ${{ inputs.additional-modules-to-lint}}
-
-    - name: Lint (tests)
-      run: poetry run pylint ${{ inputs.test-dir }} --disable="R0201,W0201,W0212,W0621,W0404,C0302"
-
-    - name: Run safety
+    - name: Check dependencies for vulnerabilities
       run: poetry export -f requirements.txt | poetry run safety check --bare --stdin
+
+    - name: Check formatting with ruff
+      run: poetry run ruff . --check
 
     - name: Run mypy
       run: poetry run mypy --show-error-codes ${{ inputs.module }}
 
-    - name: Run pytest
-      run: poetry run pytest --cov=${{ inputs.module }} --cov-report=term-missing ${{ inputs.test-dir }}
+    - name: Run ruff linting suite
+      run: poetry run ruff check . --output-format github
+
+    - name: Run unit tests
+      run: poetry run pytest --cov=bugbounty_gpt --cov-report=term-missing tests
+
 
 # Commented out for now until there is 100% coverage
 #    - name: Enforce 100% Test Coverage

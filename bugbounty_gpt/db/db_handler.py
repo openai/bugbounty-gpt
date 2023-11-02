@@ -64,7 +64,9 @@ async def update_submission_state(session: AsyncSession, submission_id: str, new
 
 
 async def fetch_submission_by_state_and_classification(
-    session: AsyncSession, states: List[SubmissionState], classifications: List[ReportCategory]
+    session: AsyncSession,
+    states: List[SubmissionState],
+    classifications: List[ReportCategory],
 ) -> Sequence[Submission]:
     """
     Fetches submissions that meet certain state and classification criteria.
@@ -76,7 +78,8 @@ async def fetch_submission_by_state_and_classification(
     """
     logger.info("Fetching submissions meeting states & classification criteria.")
     stmt = select(Submission).filter(
-        Submission.submission_state.in_(states), Submission.classification.in_(classifications)
+        Submission.submission_state.in_(states),
+        Submission.classification.in_(classifications),
     )
     result = await session.execute(stmt)
     return result.scalars().all()
