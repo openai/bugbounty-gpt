@@ -41,7 +41,7 @@ jobs:
       run: poetry export -f requirements.txt | poetry run safety check --bare --stdin
 
     - name: Check formatting with ruff
-      run: poetry run ruff . --check
+      run: poetry run ruff format . --check
 
     - name: Run mypy
       run: poetry run mypy --show-error-codes ${{ inputs.module }}
