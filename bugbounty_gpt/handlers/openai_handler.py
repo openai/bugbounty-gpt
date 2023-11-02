@@ -1,24 +1,36 @@
-import openai
-import time
-import logging
 import asyncio
-from bugbounty_gpt.env import VALID_CATEGORIES, OPENAI_PROMPT, OPENAI_MODEL, DEFAULT_CATEGORY
+import logging
+import time
+from typing import Any, Dict, Tuple
+
+import openai
+
+from bugbounty_gpt.env import (
+    DEFAULT_CATEGORY,
+    OPENAI_MODEL,
+    OPENAI_PROMPT,
+    VALID_CATEGORIES,
+)
 
 logger = logging.getLogger(__name__)
 
+# A type alias for the classification response; a tuple containing the judgment category and explanation.
+ClassificationResponse = Tuple[str, str]
+
+
 class OpenAIHandler:
     @staticmethod
-    def _classifications_sanitization(input_string):
+    def _classifications_sanitization(input_string: str) -> str:
         """
         Sanitizes the input string by removing spaces, converting to upper case, and replacing spaces with underscores.
 
         :param input_string: The input string to sanitize.
         :return: The sanitized string.
         """
-        return input_string.strip().replace(' ', '_').upper()
+        return input_string.strip().replace(" ", "_").upper()
 
     @staticmethod
-    def _build_request_data(submission_content):
+    def _build_request_data(submission_content: str) -> Dict[str, Any]:
         """
         Builds the request data for the OpenAI API.
 
@@ -31,12 +43,12 @@ class OpenAIHandler:
             "max_tokens": 512,
             "messages": [
                 {"role": "system", "content": OPENAI_PROMPT},
-                {"role": "user", "content": submission_content}
-            ]
+                {"role": "user", "content": submission_content},
+            ],
         }
 
     @staticmethod
-    def _handle_response_error(error):
+    def _handle_response_error(error: Exception) -> ClassificationResponse:
         """
         Handles errors that occurred during the OpenAI request.
 
@@ -44,10 +56,13 @@ class OpenAIHandler:
         :return: A tuple containing the default category and an error message.
         """
         logger.error(f"An error occurred during the OpenAI request: {error}")
-        return DEFAULT_CATEGORY, "An error occurred during classification. Please check application logs."
+        return (
+            DEFAULT_CATEGORY,
+            "An error occurred during classification. Please check application logs.",
+        )
 
     @staticmethod
-    def _handle_response(response):
+    def _handle_response(response: Any) -> ClassificationResponse:
         """
         Handles the response from the OpenAI API.
 
@@ -56,17 +71,17 @@ class OpenAIHandler:
         """
         try:
             response_text = response.choices[0].message.content
-            judgement, explanation = response_text.rsplit('\n', 1)
+            judgement, explanation = response_text.rsplit("\n", 1)
             sanitized_judgement = OpenAIHandler._classifications_sanitization(judgement)
             if sanitized_judgement in VALID_CATEGORIES:
                 return sanitized_judgement, explanation.strip()
             else:
                 return DEFAULT_CATEGORY, explanation.strip()
-        except Exception as error:
+        except Exception as error:  # pylint: disable=broad-except
             return OpenAIHandler._handle_response_error(error)
 
     @staticmethod
-    async def classify_submission(submission_content):
+    async def classify_submission(submission_content: str) -> ClassificationResponse:
         """
         Classifies the submission content using the OpenAI API.
 
@@ -80,5 +95,5 @@ class OpenAIHandler:
             loop = asyncio.get_running_loop()
             response = await loop.run_in_executor(None, lambda: openai.ChatCompletion.create(**request_data))
             return OpenAIHandler._handle_response(response)
-        except Exception as error:
+        except Exception as error:  # pylint: disable=broad-except
             return OpenAIHandler._handle_response_error(error)

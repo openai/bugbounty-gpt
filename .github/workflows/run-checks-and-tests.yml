@@ -1,0 +1,58 @@
+name: Run Checks and Tests
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Source Code
+      uses: actions/checkout@v3
+
+    - name: Install & set-up Python 3.11
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+
+    - name: Install Poetry
+      run: |
+        python -m pip install --upgrade pip
+        pip install poetry
+
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ./.venv
+        key: poetry-v1-${{ hashFiles('poetry.lock') }}
+        restore-keys: |
+          poetry-v1-
+
+    - name: Dependency installation
+      run: poetry install
+
+    - name: Check dependencies for vulnerabilities
+      run: poetry export -f requirements.txt | poetry run safety check --bare --stdin
+
+    - name: Check formatting with ruff
+      run: poetry run ruff format . --check
+
+    - name: Run mypy
+      run: poetry run mypy bugbounty_gpt --show-error-codes ${{ inputs.module }}
+
+    - name: Run ruff linting suite
+      run: poetry run ruff check . --output-format github
+
+    - name: Run unit tests
+      run: poetry run pytest --cov=bugbounty_gpt --cov-report=term-missing tests
+
+
+# Commented out for now until there is 100% coverage
+#    - name: Enforce 100% Test Coverage
+#      run: poetry run coverage report --fail-under=100

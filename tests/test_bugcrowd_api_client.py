@@ -1,14 +1,17 @@
-from unittest.mock import patch, AsyncMock, MagicMock
-import httpx
-import pytest, asyncio
+from unittest.mock import AsyncMock, MagicMock, patch
 
-from bugbounty_gpt.env import BUGCROWD_API_KEY, API_BASE_URL
+import httpx
+import pytest
+
+from bugbounty_gpt.env import API_BASE_URL, BUGCROWD_API_KEY
 from bugbounty_gpt.handlers.bugcrowd_api import BugCrowdAPI
+
 
 def test_get_headers():
     headers = BugCrowdAPI._get_headers()
-    assert headers['Accept'] == 'application/vnd.bugcrowd+json'
-    assert headers['Authorization'] == f'Token {BUGCROWD_API_KEY}'
+    assert headers["Accept"] == "application/vnd.bugcrowd+json"
+    assert headers["Authorization"] == f"Token {BUGCROWD_API_KEY}"
+
 
 @pytest.mark.asyncio
 async def test_fetch_page():
@@ -18,30 +21,40 @@ async def test_fetch_page():
     page_offset = 0
 
     mock_response = AsyncMock(status_code=200)
-    mock_response.json = MagicMock(return_value={"data": ["submission1", "submission2"]})  # Use MagicMock for the synchronous json method
+    mock_response.json = MagicMock(
+        return_value={"data": ["submission1", "submission2"]}
+    )  # Use MagicMock for the synchronous json method
 
-    with patch.object(httpx.AsyncClient, 'get', return_value=mock_response) as mock_get:
-        submissions = await BugCrowdAPI._fetch_page(url, params, page_limit, page_offset) # await the async function
+    with patch.object(httpx.AsyncClient, "get", return_value=mock_response):
+        submissions = await BugCrowdAPI._fetch_page(url, params, page_limit, page_offset)  # await the async function
         assert submissions == ["submission1", "submission2"]  # No await here
+
 
 @pytest.mark.asyncio
 async def test_fetch_submissions():
     params = {"param": "value"}
-    with patch("bugbounty_gpt.handlers.bugcrowd_api.BugCrowdAPI._fetch_page", new_callable=AsyncMock) as mock_fetch_page:
+    with patch(
+        "bugbounty_gpt.handlers.bugcrowd_api.BugCrowdAPI._fetch_page",
+        new_callable=AsyncMock,
+    ) as mock_fetch_page:
         mock_fetch_page.side_effect = [["submission1", "submission2"], []]
         submissions = await BugCrowdAPI.fetch_submissions(params)
         assert submissions == ["submission1", "submission2"]
+
 
 @pytest.mark.asyncio
 async def test_fetch_submission():
     submission_id = "test_id"
 
     mock_response = AsyncMock(status_code=200)
-    mock_response.json = MagicMock(return_value={"data": "submission_data"})  # Use MagicMock for the synchronous json method
+    mock_response.json = MagicMock(
+        return_value={"data": "submission_data"}
+    )  # Use MagicMock for the synchronous json method
 
-    with patch.object(httpx.AsyncClient, 'get', return_value=mock_response) as mock_get:
+    with patch.object(httpx.AsyncClient, "get", return_value=mock_response):
         submission = await BugCrowdAPI.fetch_submission(submission_id)
         assert submission == {"data": "submission_data"}  # No await here
+
 
 @pytest.mark.asyncio
 async def test_create_comment():
@@ -49,11 +62,12 @@ async def test_create_comment():
     mock_response = AsyncMock()
     mock_response.status_code = 201
 
-    with patch.object(httpx.AsyncClient, 'post', return_value=mock_response) as mock_post:
+    with patch.object(httpx.AsyncClient, "post", return_value=mock_response) as mock_post:
         response = await BugCrowdAPI.create_comment(comment_data)
         assert response.status_code == 201
 
     mock_post.assert_called_once()
+
 
 @pytest.mark.asyncio
 async def test_patch_submission():
@@ -63,7 +77,7 @@ async def test_patch_submission():
     mock_json = AsyncMock(return_value={"data": "patched_submission_data"})
     mock_response = AsyncMock(status_code=200, json=mock_json)
 
-    with patch.object(httpx.AsyncClient, 'patch', return_value=mock_response) as mock_patch:
+    with patch.object(httpx.AsyncClient, "patch", return_value=mock_response) as mock_patch:
         response = await BugCrowdAPI.patch_submission(submission_id, data)
         assert await response.json() == {"data": "patched_submission_data"}
 

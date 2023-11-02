@@ -1,10 +1,9 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
-from alembic import context
 import bugbounty_gpt.db.models as models
+from alembic import context
 from bugbounty_gpt.env import SQLALCHEMY_URL
 
 # this is the Alembic Config object, which provides
@@ -21,6 +20,7 @@ target_metadata = models.Base.metadata
 SYNCHRONOUS_SQLALCHEMY_URL = SQLALCHEMY_URL.replace("+asyncpg", "")
 sqlalchemy_url = SYNCHRONOUS_SQLALCHEMY_URL
 config.set_main_option("sqlalchemy.url", f"{sqlalchemy_url}")
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -60,9 +60,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

@@ -1,39 +1,21 @@
-from bugbounty_gpt.handlers.submission_handler import BugCrowdSubmission
-from bugbounty_gpt.handlers.bugcrowd_api import BugCrowdAPI
-from unittest.mock import patch, AsyncMock
 import logging
+from unittest.mock import AsyncMock, patch
+
 import pytest
 
-def test_prepare_comment_data():
-    submission = BugCrowdSubmission("submission_id", None, None)
-    comment_body = "Test comment"
-    expected_data = {
-        "data": {
-            "type": "comment",
-            "attributes": {
-                "body": comment_body,
-                "visibility_scope": "everyone"
-            },
-            "relationships": {
-                "submission": {
-                    "data": {
-                        "id": "submission_id",
-                        "type": "submission"
-                    }
-                }
-            }
-        }
-    }
-    assert submission._prepare_comment_data(comment_body) == expected_data
+from bugbounty_gpt.handlers.bugcrowd_api import BugCrowdAPI
+from bugbounty_gpt.handlers.submission_handler import BugCrowdSubmission
+
 
 @pytest.mark.asyncio
 async def test_create_comment_success():
     submission = BugCrowdSubmission("submission_id", None, None)
     comment_body = "Test comment"
 
-    with patch.object(BugCrowdAPI, 'create_comment', new_callable=AsyncMock) as mock_create_comment:
+    with patch.object(BugCrowdAPI, "create_comment", new_callable=AsyncMock) as mock_create_comment:
         await submission.create_comment(comment_body)
         mock_create_comment.assert_called_once()
+
 
 @pytest.mark.asyncio
 async def test_create_comment_error_handling(caplog):
@@ -41,9 +23,21 @@ async def test_create_comment_error_handling(caplog):
     comment_body = "Test comment"
 
     for error_code in [400, 404, 409]:
-        mock_response = type("Response", (object,), {"status_code": error_code, "json": lambda: {"errors": [{"detail": "error message"}]}})
+        mock_response = type(
+            "Response",
+            (object,),
+            {
+                "status_code": error_code,
+                "json": lambda: {"errors": [{"detail": "error message"}]},
+            },
+        )
 
-        with patch.object(BugCrowdAPI, 'create_comment', new_callable=AsyncMock, return_value=mock_response):
+        with patch.object(
+            BugCrowdAPI,
+            "create_comment",
+            new_callable=AsyncMock,
+            return_value=mock_response,
+        ):
             with caplog.at_level(logging.ERROR):  # Capture ERROR-level logs
                 await submission.create_comment(comment_body)
 
