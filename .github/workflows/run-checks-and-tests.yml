@@ -44,7 +44,7 @@ jobs:
       run: poetry run ruff format . --check
 
     - name: Run mypy
-      run: poetry run mypy --show-error-codes ${{ inputs.module }}
+      run: poetry run mypy bugbounty_gpt --show-error-codes ${{ inputs.module }}
 
     - name: Run ruff linting suite
       run: poetry run ruff check . --output-format github
