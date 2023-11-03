@@ -1,5 +1,4 @@
 import openai
-import time
 import logging
 import asyncio
 from bugbounty_gpt.env import VALID_CATEGORIES, OPENAI_PROMPT, OPENAI_MODEL, DEFAULT_CATEGORY
@@ -74,7 +73,8 @@ class OpenAIHandler:
         :return: A tuple containing the judgment category and explanation, or an error response if something goes wrong.
         """
         logger.info("Classifying submission's content.")
-        time.sleep(5)  # Consider replacing with a more robust rate-limiting strategy
+        # TODO: Consider replacing with a more robust rate-limiting strategy
+        await asyncio.sleep(5)
         try:
             request_data = OpenAIHandler._build_request_data(submission_content)
             loop = asyncio.get_running_loop()

@@ -1,7 +1,7 @@
+import asyncio
 import json
 import httpx
 import logging
-import time
 from bugbounty_gpt.env import API_BASE_URL, BUGCROWD_API_KEY
 
 logger = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ class BugCrowdAPI:
             all_submissions.extend(submissions)
             page_offset += page_limit
 
-            time.sleep(delay)  # Add a delay between API calls
+            await asyncio.sleep(delay)  # Add a delay between API calls
 
         return all_submissions if all_submissions else None
 

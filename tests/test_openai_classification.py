@@ -49,20 +49,52 @@ def test_handle_response_exception():
         OpenAIHandler._handle_response(response)
         mock_handle_error.assert_called()
 
-@pytest.mark.asyncio
-async def test_classify_submission_exception():
-    with patch("openai.ChatCompletion.create") as mock_create:
-        mock_create.side_effect = Exception("Sample Error")
-        with patch("bugbounty_gpt.handlers.openai_handler.OpenAIHandler._handle_response_error") as mock_handle_error:
-            await OpenAIHandler.classify_submission("Sample content")
-            mock_handle_error.assert_called()
 
-@pytest.mark.asyncio
-async def test_classify_submission_success():
-    with patch("openai.ChatCompletion.create") as mock_create:
-        mock_create.return_value = type("Response", (object,), {
-            "choices": [type("Choice", (object,), {"message": type("Message", (object,), {"content": " Policy or Content Complaints\nExplanation"})})]
-        })
-        category, explanation = await OpenAIHandler.classify_submission("Sample content")
+class TestClassifySubmission:
+    @pytest.fixture(autouse=True)
+    def setup(self, mocker, mock_async_sleep):
+        self.mock_create_chat_completion = mocker.patch("openai.ChatCompletion.create")
+
+    @pytest.mark.asyncio
+    async def test_exception_during_classification(self, mocker):
+        self.mock_create_chat_completion.side_effect = Exception("Sample Error")
+        mock_handle_error = mocker.patch(
+            "bugbounty_gpt.handlers.openai_handler.OpenAIHandler._handle_response_error"
+        )
+
+        await OpenAIHandler.classify_submission("Sample content")
+
+        mock_handle_error.assert_called()
+        self.mock_create_chat_completion.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_success(self):
+        self.mock_create_chat_completion.return_value = type(
+            "Response",
+            (object,),
+            {
+                "choices": [
+                    type(
+                        "Choice",
+                        (object,),
+                        {
+                            "message": type(
+                                "Message",
+                                (object,),
+                                {
+                                    "content": " Policy or Content Complaints\nExplanation"
+                                },
+                            )
+                        },
+                    )
+                ]
+            },
+        )
+
+        category, explanation = await OpenAIHandler.classify_submission(
+            "Sample content"
+        )
+
         assert category == "POLICY_OR_CONTENT_COMPLAINTS"
         assert explanation == "Explanation"
+        self.mock_create_chat_completion.assert_called_once()
