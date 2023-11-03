@@ -1,5 +1,4 @@
 import openai
-import time
 import logging
 import asyncio
 from bugbounty_gpt.env import VALID_CATEGORIES, OPENAI_PROMPT, OPENAI_MODEL, DEFAULT_CATEGORY

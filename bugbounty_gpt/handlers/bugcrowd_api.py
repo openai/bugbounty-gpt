@@ -2,7 +2,6 @@ import asyncio
 import json
 import httpx
 import logging
-import time
 from bugbounty_gpt.env import API_BASE_URL, BUGCROWD_API_KEY
 
 logger = logging.getLogger(__name__)
